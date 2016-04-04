@@ -1,0 +1,11 @@
+﻿
+<h2>Riders</h2>
+<table class="table table-striped table-bordered">
+    <tr>
+        <th>Name</th>
+    </tr>
+    <tr ng-repeat="rider in model.riders">
+        <td><a ui-sref="bikeEdit({id: rider.id})">{{rider.name}}</a></td>
+    </tr>
+</table>
+

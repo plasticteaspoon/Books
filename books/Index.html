@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+	<meta charset="utf-8" />
+
+    <link rel="stylesheet" type="text/css" href="Content/bootstrap/bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="Content/bootstrap/bootstrap-theme.css" />
+    <script src="Content/angular/angular.js"></script>
+
+    <script>
+        var booksApp = angular.module("booksApp", []);
+        booksApp.controller("bookListController", ["$scope", "$http", function ($scope, $http) {
+
+            $scope.title;
+            $scope.author;
+
+            $http
+                .get("/api/book")
+                .then(function (response) {
+                    $scope.books = response.data;
+                });
+
+            //$scope.books = [
+            //    {title: "The Hobbit", author: "JRR Tolkein"},
+            //    {title:"The Lord of the Rings", author: "JRR Tolkein"},
+            //    { title: "Harry Potter and the Philosophers stone", author: "JK Rowling" }];
+
+            $scope.addBook = function () {
+                $scope.books.push( {title: $scope.title, author: $scope.author } );
+            };
+        }]);
+    </script>
+
+</head>
+
+<body ng-app="booksApp">
+    <div class="container" ng-controller="bookListController">
+
+        <h2 class="h2">Hello books</h2>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr ng-repeat="b in books">
+                    <td>{{b.title}}</td>
+                    <td>{{b.author}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <form>
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" class="form-control" ng-model="title" placeholder="Enter a title"/>
+            </div>
+
+            <div class="form-group">
+                <label>Author</label>
+                <input type="text" class="form-control" ng-model="author" placeholder="Enter an author"/>
+            </div>
+            <button class="btn btn-default" ng-click="addBook()">Add Book</button>
+        </form>
+
+    </div>
+</body>
+</html>
