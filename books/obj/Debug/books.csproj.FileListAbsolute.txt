@@ -39,3 +39,4 @@ C:\Users\jessi\Documents\GitHub\books\books\bin\System.Web.Http.WebHost.xml
 C:\Users\jessi\Documents\GitHub\books\books\obj\Debug\books.csprojResolveAssemblyReference.cache
 C:\Users\jessi\Documents\GitHub\books\books\obj\Debug\books.dll
 C:\Users\jessi\Documents\GitHub\books\books\obj\Debug\books.pdb
+C:\Users\jessi\Documents\GitHub\books\books\bin\MySql.Data.dll
