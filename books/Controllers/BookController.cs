@@ -33,18 +33,19 @@ namespace books.Controllers
                 result.ToString(Newtonsoft.Json.Formatting.Indented));
 
             return result;
+        }
 
-            //return new JArray(
-            //    new JObject(
-            //        new JProperty("title", "Baddy wins"),
-            //        new JProperty("author", "Daddy Drury")
-            //        ),
-                    
-            //    new JObject(
-            //        new JProperty("title", "Gooddy wins"),
-            //        new JProperty("author", "Daddy Drury")
-            //        )
-            //    );
+        [HttpPost]
+        [Route("api/book")]
+        public JObject Post(Book book)
+        {
+            Database db = new Database("books");
+            db.Insert(book);
+
+            return new JObject(
+                    new JProperty("id", book.id),
+                    new JProperty("title", book.title),
+                    new JProperty("author", book.author));
         }
     }
 }

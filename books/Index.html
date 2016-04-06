@@ -7,27 +7,30 @@
     <link rel="stylesheet" type="text/css" href="Content/bootstrap/bootstrap.css"/>
     <link rel="stylesheet" type="text/css" href="Content/bootstrap/bootstrap-theme.css" />
     <script src="Content/angular/angular.js"></script>
+    <script src="Content/angular-resource/angular-resource.js"></script>
 
     <script>
-        var booksApp = angular.module("booksApp", []);
-        booksApp.controller("bookListController", ["$scope", "$http", function ($scope, $http) {
+        var booksApp = angular.module("booksApp", ["ngResource"]);
+
+        booksApp.factory("Book", ["$resource", function ($resource) {
+            return $resource("/api/book/:id");
+        }]);
+
+        booksApp.controller("bookListController", ["$scope", "Book", function ($scope, Book) {
 
             $scope.title;
             $scope.author;
-
-            $http
-                .get("/api/book")
-                .then(function (response) {
-                    $scope.books = response.data;
-                });
-
-            //$scope.books = [
-            //    {title: "The Hobbit", author: "JRR Tolkein"},
-            //    {title:"The Lord of the Rings", author: "JRR Tolkein"},
-            //    { title: "Harry Potter and the Philosophers stone", author: "JK Rowling" }];
+            $scope.books = Book.query();
 
             $scope.addBook = function () {
-                $scope.books.push( {title: $scope.title, author: $scope.author } );
+                var newBook = new Book();
+
+                newBook.title = $scope.title;
+                newBook.author = $scope.author;
+
+                newBook.$save(function (data) {
+                    $scope.books.push(data);
+                });
             };
         }]);
     </script>
