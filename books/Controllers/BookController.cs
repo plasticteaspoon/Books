@@ -23,16 +23,24 @@ namespace books.Controllers
             List<Book> books = db.Fetch<Book>("");
 
             JArray result = new JArray(
-                books.Select(b => new JObject(
-                    new JProperty("id", b.id),
-                    new JProperty("title", b.title),
-                    new JProperty("author", b.author))));
+                books.Select(b => b.toJObject()));
 
             File.WriteAllText(
                 HostingEnvironment.MapPath("/App_Data/books.json"), 
                 result.ToString(Newtonsoft.Json.Formatting.Indented));
 
             return result;
+        }
+
+        [HttpGet]
+        [Route("api/book/{id:int}")]
+        public JObject Get(int id)
+        {
+            Database db = new Database("books");
+
+            Book book = db.Single<Book>(id);
+
+            return book.toJObject();
         }
 
         [HttpPost]
@@ -42,10 +50,31 @@ namespace books.Controllers
             Database db = new Database("books");
             db.Insert(book);
 
-            return new JObject(
-                    new JProperty("id", book.id),
-                    new JProperty("title", book.title),
-                    new JProperty("author", book.author));
+            return book.toJObject();
+        }
+
+        [HttpPut]
+        [Route("api/book/{id:int}")]
+        public JObject Put(int id, Book book)
+        {
+            Database db = new Database("books");
+            db.Update(book);
+
+            return book.toJObject();
+        }
+
+        [HttpDelete]
+        [Route("api/book/{id:int}")]
+        public JObject Delete(int id)
+        {
+            Database db = new Database("books");
+
+            Book book = new Book();
+            book.id = id;
+
+            db.Delete(book);
+
+            return new JObject();
         }
     }
 }

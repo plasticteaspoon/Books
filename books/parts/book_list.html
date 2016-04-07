@@ -1,0 +1,19 @@
+﻿<h2 class="h2">Hello books</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr ng-repeat="b in books">
+            <td>{{b.title}}</td>
+            <td>{{b.author}}</td>
+            <td><a href="#" ng-click="deleteBook(b.id)">Delete</a></td>
+            <td><a ui-sref="edit({id:b.id})">Edit</a></td>
+        </tr>
+    </tbody>
+</table>

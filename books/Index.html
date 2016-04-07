@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html>
+
 <head>
     <title></title>
 	<meta charset="utf-8" />
@@ -8,29 +9,82 @@
     <link rel="stylesheet" type="text/css" href="Content/bootstrap/bootstrap-theme.css" />
     <script src="Content/angular/angular.js"></script>
     <script src="Content/angular-resource/angular-resource.js"></script>
+    <script src="Content/angular-ui-router/release/angular-ui-router.js"></script>
 
     <script>
-        var booksApp = angular.module("booksApp", ["ngResource"]);
+        var booksApp = angular.module("booksApp", ["ngResource", 'ui.router']);
+
+        booksApp.config(["$urlRouterProvider", "$stateProvider", function (routerProvider, stateProvider) {
+
+            routerProvider.otherwise("/home");
+
+            stateProvider.state("home", {
+                url: "/home",
+                templateUrl: "/parts/book_list.html",
+                controller: "bookListController"
+            });
+            stateProvider.state("add", {
+                url: "/add",
+                templateUrl: "/parts/add_book.html",
+                controller: "addBookController"
+            });
+            stateProvider.state("edit", {
+                url: "/edit/:id",
+                templateUrl: "/parts/edit_book.html",
+                controller: "editBookController"
+            });
+        }]);
 
         booksApp.factory("Book", ["$resource", function ($resource) {
-            return $resource("/api/book/:id");
+            return $resource("/api/book/:id", null,
+                {
+                    'update': { method: 'PUT'}
+                });
         }]);
 
         booksApp.controller("bookListController", ["$scope", "Book", function ($scope, Book) {
 
-            $scope.title;
-            $scope.author;
             $scope.books = Book.query();
 
-            $scope.addBook = function () {
-                var newBook = new Book();
+            $scope.deleteBook = function (bookId) {
 
-                newBook.title = $scope.title;
-                newBook.author = $scope.author;
-
-                newBook.$save(function (data) {
-                    $scope.books.push(data);
+                Book.delete({ id: bookId }, null, function () {
+                    $scope.books = $scope.books.filter(function (ele) {
+                        return ele.id != bookId;
+                    });
                 });
+            };
+
+        }]);
+
+        booksApp.controller("addBookController", ["$scope", "Book", "$state", function ($scope, Book, state) {
+
+            $scope.book = new Book();
+
+            $scope.addBook = function () {
+
+                $scope.book.$save(function (data) {
+                    state.go("home");
+                });
+            };
+        }]);
+
+        booksApp.controller("editBookController", ["$scope", "Book", "$state", "$stateParams", function ($scope, Book, state, stateParams) {
+
+            var bookId = stateParams.id;
+
+            $scope.book = Book.get({ id: bookId });
+
+            $scope.editBook = function () {
+
+                Book.update({ id: bookId }, $scope.book)
+                .$promise.then(function (data) {
+                    state.go("home");
+                });
+
+                //$scope.book.update({ id: bookId }, function (data) {
+                //    state.go("home");
+                //});
             };
         }]);
     </script>
@@ -38,39 +92,19 @@
 </head>
 
 <body ng-app="booksApp">
-    <div class="container" ng-controller="bookListController">
 
-        <h2 class="h2">Hello books</h2>
+    <div class="container">
 
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Author</th>
-                </tr>
-            </thead>
+        <nav class="navbar navbar-inverse">
+            <ul class="nav navbar-nav">
+                <li><a ui-sref="home">Home</a></li>
+                <li><a ui-sref="add">Add book</a></li>
+            </ul>
+        </nav>
 
-            <tbody>
-                <tr ng-repeat="b in books">
-                    <td>{{b.title}}</td>
-                    <td>{{b.author}}</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <form>
-            <div class="form-group">
-                <label>Title</label>
-                <input type="text" class="form-control" ng-model="title" placeholder="Enter a title"/>
-            </div>
-
-            <div class="form-group">
-                <label>Author</label>
-                <input type="text" class="form-control" ng-model="author" placeholder="Enter an author"/>
-            </div>
-            <button class="btn btn-default" ng-click="addBook()">Add Book</button>
-        </form>
-
+        <div ui-view></div>
     </div>
+
 </body>
+
 </html>
